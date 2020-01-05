@@ -30,7 +30,8 @@ export default {
   },
   methods: {
       handleItemClick(index) {
-          this.currentIndex = index
+          this.currentIndex = index,
+          this.$emit('tabClick', index)
       }
   },
 };
