@@ -10,5 +10,6 @@ module.exports = {
                 'common': '@/common'
             }
         }
-    }
+    },
+    publicPath: './'
 }
