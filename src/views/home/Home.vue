@@ -3,114 +3,23 @@
     <nav-bar class="home-nav">
       <template #center>购物街</template>
     </nav-bar>
-    <home-swiper :banners="banners" />
-    <recommend-view :recommends="recommends" />
-    <feature-view />
-    <tab-control :titles="titles" class="tab-control" @tabClick="tabClick" />
-    <goods-list :goods="showGoods" />
 
-    <ul>
-      <li>推荐1</li>
-      <li>推荐2</li>
-      <li>推荐3</li>
-      <li>推荐4</li>
-      <li>推荐5</li>
-      <li>推荐6</li>
-      <li>推荐7</li>
-      <li>推荐8</li>
-      <li>推荐9</li>
-      <li>推荐10</li>
-      <li>推荐11</li>
-      <li>推荐12</li>
-      <li>推荐13</li>
-      <li>推荐14</li>
-      <li>推荐15</li>
-      <li>推荐16</li>
-      <li>推荐17</li>
-      <li>推荐18</li>
-      <li>推荐19</li>
-      <li>推荐20</li>
-      <li>推荐21</li>
-      <li>推荐22</li>
-      <li>推荐23</li>
-      <li>推荐24</li>
-      <li>推荐25</li>
-      <li>推荐26</li>
-      <li>推荐27</li>
-      <li>推荐28</li>
-      <li>推荐29</li>
-      <li>推荐30</li>
-      <li>推荐31</li>
-      <li>推荐32</li>
-      <li>推荐33</li>
-      <li>推荐34</li>
-      <li>推荐35</li>
-      <li>推荐36</li>
-      <li>推荐37</li>
-      <li>推荐38</li>
-      <li>推荐39</li>
-      <li>推荐40</li>
-      <li>推荐41</li>
-      <li>推荐42</li>
-      <li>推荐43</li>
-      <li>推荐44</li>
-      <li>推荐45</li>
-      <li>推荐46</li>
-      <li>推荐47</li>
-      <li>推荐48</li>
-      <li>推荐49</li>
-      <li>推荐50</li>
-      <li>推荐51</li>
-      <li>推荐52</li>
-      <li>推荐53</li>
-      <li>推荐54</li>
-      <li>推荐55</li>
-      <li>推荐56</li>
-      <li>推荐57</li>
-      <li>推荐58</li>
-      <li>推荐59</li>
-      <li>推荐60</li>
-      <li>推荐61</li>
-      <li>推荐62</li>
-      <li>推荐63</li>
-      <li>推荐64</li>
-      <li>推荐65</li>
-      <li>推荐66</li>
-      <li>推荐67</li>
-      <li>推荐68</li>
-      <li>推荐69</li>
-      <li>推荐70</li>
-      <li>推荐71</li>
-      <li>推荐72</li>
-      <li>推荐73</li>
-      <li>推荐74</li>
-      <li>推荐75</li>
-      <li>推荐76</li>
-      <li>推荐77</li>
-      <li>推荐78</li>
-      <li>推荐79</li>
-      <li>推荐80</li>
-      <li>推荐81</li>
-      <li>推荐82</li>
-      <li>推荐83</li>
-      <li>推荐84</li>
-      <li>推荐85</li>
-      <li>推荐86</li>
-      <li>推荐87</li>
-      <li>推荐88</li>
-      <li>推荐89</li>
-      <li>推荐90</li>
-      <li>推荐91</li>
-      <li>推荐92</li>
-      <li>推荐93</li>
-      <li>推荐94</li>
-      <li>推荐95</li>
-      <li>推荐96</li>
-      <li>推荐97</li>
-      <li>推荐98</li>
-      <li>推荐99</li>
-      <li>推荐100</li>
-    </ul>
+    <Scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+      :pull-up-load="true"
+      @pullingUp="loadMore"
+    >
+      <home-swiper :banners="banners" />
+      <recommend-view :recommends="recommends" />
+      <feature-view />
+      <tab-control :titles="titles" class="tab-control" @tabClick="tabClick" />
+      <goods-list :goods="showGoods" />
+    </Scroll>
+
+    <back-top @click.native="handleBackClick" v-show="isBackTopShow"></back-top>
   </div>
 </template>
 
@@ -119,6 +28,8 @@
 import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodsList from "components/content/goods/GoodsList";
+import Scroll from "components/common/scroll/Scroll";
+import BackTop from "components/content/backTop/BackTop";
 
 // 子组件
 import HomeSwiper from "./childComps/HomeSwiper";
@@ -133,6 +44,8 @@ export default {
     NavBar,
     TabControl,
     GoodsList,
+    Scroll,
+    BackTop,
 
     HomeSwiper,
     RecommendView,
@@ -148,7 +61,8 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: "pop",
-      titles: ['流行', '新款', '精选']
+      titles: ["流行", "新款", "精选"],
+      isBackTopShow: false
     };
   },
   created() {
@@ -156,6 +70,16 @@ export default {
     this.init();
   },
   methods: {
+    loadMore() {
+      this.getHomeProducts(this.currentType)
+    },
+    contentScroll(position) {
+      this.isBackTopShow = -position.y > 1000;
+    },
+    handleBackClick() {
+      this.$refs.scroll.scrollTo(0, 0, 500);
+    },
+
     /**
      * 事件监听相关的方法
      */
@@ -163,14 +87,14 @@ export default {
       console.log(index);
       switch (index) {
         case 0:
-          this.currentType = "pop"
-          break
+          this.currentType = "pop";
+          break;
         case 1:
-          this.currentType = "new"
-          break
+          this.currentType = "new";
+          break;
         case 2:
-          this.currentType = "sell"
-          break
+          this.currentType = "sell";
+          break;
       }
     },
     /**
@@ -202,6 +126,8 @@ export default {
         res => {
           this.goods[type].list.push(...res.data.data.list);
           this.goods[type].page++;
+          // 加载更多
+          this.$refs.scroll.finishPullUp()
         },
         err => {
           window.alert("请求错误");
@@ -211,15 +137,18 @@ export default {
   },
   computed: {
     showGoods() {
-      return this.goods[this.currentType].list
+      return this.goods[this.currentType].list;
     }
-  },
+  }
 };
 </script>
 
-<style>
+<style scoped>
 #home {
+  position: relative;
   padding-top: 44px;
+  /* vh 是视口高度  viewportheight*/
+  height: 100vh;
 }
 .home-nav {
   background-color: var(--color-tint);
@@ -236,4 +165,19 @@ export default {
   background-color: #fff;
   z-index: 9;
 }
+
+.content {
+  /* height: 300px; */
+  overflow: hidden;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
+}
+/* .content {
+  height: calc(100% - 93px);
+  overflow: hidden;
+  margin-top: 44px;
+} */
 </style>

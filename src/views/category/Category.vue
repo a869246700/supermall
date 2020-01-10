@@ -1,6 +1,7 @@
 <template>
   <div class="wrapper">
-    <ul class="content">
+    <ul>
+      <button @click="handleClick">按钮</button>
       <li>分类列表1</li>
       <li>分类列表2</li>
       <li>分类列表3</li>
@@ -106,12 +107,34 @@
 </template>
 
 <script>
-import BScroll from "@better-scroll/core";
+import BScroll from "better-scroll";
 
 export default {
   name: "Category",
+  data() {
+    return {
+      scroll: null
+    };
+  },
+  methods: {
+    handleClick() {
+      alert(111)
+    }
+  },
   mounted() {
-    new BScroll(".wrapper", {});
+    this.scroll = new BScroll(".wrapper", {
+      probeType: 3,
+      pullUpLoad: true
+    });
+    // 监听滚动到的位置事件
+    this.scroll.on("scroll", position => {
+      // console.log(position);
+    });
+    // 监听滚到底部事件
+    this.scroll.on("pullingUp", () => {
+      console.log("上啦加载更多");
+      this.scroll.finishPullUp();
+    });
   }
 };
 </script>
@@ -121,6 +144,5 @@ export default {
   height: 150px;
   background-color: red;
   overflow: hidden;
-  /* overflow-y: scroll; */
 }
 </style>
