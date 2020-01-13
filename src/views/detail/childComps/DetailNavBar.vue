@@ -35,6 +35,7 @@ export default {
   methods: {
     handleItemClick(index) {
         this.currentIndex = index
+        this.$emit('titleClick', index)
     },
     handleBackClick() {
         // 相对于back

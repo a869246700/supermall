@@ -1,14 +1,14 @@
 <template>
   <div id="detail">
-    <detail-nav-bar />
-    <Scroll class="content" ref="scroll">
+    <detail-nav-bar @titleClick="titleClick" ref="nav"/>
+    <Scroll class="content" ref="scroll" :probe-type="3" @scroll="detailScroll">
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" />
-      <detail-param-info :paramInfo="paramInfo" />
-      <detail-comment-info :comment-info="commentInfo" />
-      <detail-recommend-info :recommends="recommends" />
+      <detail-param-info :paramInfo="paramInfo" ref="params" />
+      <detail-comment-info :comment-info="commentInfo" ref="comment" />
+      <detail-recommend-info :recommends="recommends" ref="recommend" />
     </Scroll>
   </div>
 </template>
@@ -27,7 +27,7 @@ import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
 
 // 通用js文件
-import {itemListenerMixin} from 'common/mixin'
+import { itemListenerMixin } from "common/mixin";
 // 请求
 import {
   getDetail,
@@ -36,7 +36,6 @@ import {
   GoodsParam,
   getRecommend
 } from "network/detail";
-
 
 export default {
   name: "Detail",
@@ -50,11 +49,47 @@ export default {
       paramInfo: {}, //参数信息
       commentInfo: {}, //评论信息
       recommends: [], //推荐信息
+      themeTopYs: [],
+      currentIndex: 0
     };
   },
   methods: {
     imageLoad() {
-      this.$refs.scroll.refresh();
+      this.refresh();
+      this.initHeight();
+    },
+    titleClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index] + 44, 200);
+    },
+    initHeight() {
+      // 定义高度
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+    },
+    detailScroll(position) {
+      const positionY = -position.y + 44;
+
+      // 对比
+      // [0, 8888] -> 0
+      // [8888, 9999] -> 1
+      // [9999, 11111] -> 2
+      // [11111, 18888] -> 3
+      let length = this.themeTopYs.length;
+      for (let i = 0; i < length; i++) {
+        if (
+          this.currentIndex !== i &&
+          ((i < length - 1 &&
+            positionY >= this.themeTopYs[i] &&
+            positionY < this.themeTopYs[i + 1]) ||
+            (i === length - 1 && positionY > this.themeTopYs[i]))
+        ) {
+          this.currentIndex = i
+          this.$refs.nav.currentIndex = this.currentIndex
+        }
+      }
     }
   },
   components: {
@@ -100,21 +135,16 @@ export default {
       if (data.rate.cRate !== 0) {
         this.commentInfo = data.rate.list[0];
       }
-
-      // 7 推荐信息
     });
 
     //  3. 请求推荐数据
     getRecommend().then(res => {
       this.recommends.push(...res.data.data.list);
-      console.log(this.recommends);
-      
     });
   },
-  mounted() {
-  },
+  updated() {},
   destroyed() {
-    this.$bus.$off('itemImgLoad', this.itemImgListener)
+    this.$bus.$off("itemImgLoad", this.itemImgListener);
   },
   mixins: [itemListenerMixin]
 };

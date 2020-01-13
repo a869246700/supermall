@@ -155,8 +155,6 @@ export default {
       );
     }
   },
-  mounted() {
-  },
   computed: {
     showGoods() {
       return this.goods[this.currentType].list;
@@ -174,7 +172,7 @@ export default {
   */
   activated() {
     // 进入当前组件
-    this.$refs.scroll.refresh()
+    this.refresh()
     this.$refs.scroll.scrollTo(0, this.saveY, 0)
     // 重新刷新  防止回到页面顶部
   },

@@ -1,8 +1,7 @@
 <template>
   <div class="recommend-info">
     <div class="info-header">热门推荐</div>
-    <goods-list :goods="recommends">
-    </goods-list>
+    <goods-list :goods="recommends"/>
   </div>
 </template>
 
