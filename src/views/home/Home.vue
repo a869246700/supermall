@@ -38,9 +38,10 @@ import FeatureView from "./childComps/FeatureView";
 // 数据
 import { getHomeMultidata, getHomeGoods } from "network/home";
 // 通用js文件
-import { debounce } from "common/utils";
+import {itemListenerMixin} from 'common/mixin'
 export default {
   name: "Home",
+  mixins: [itemListenerMixin],
   components: {
     NavBar,
     TabControl,
@@ -65,12 +66,9 @@ export default {
       titles: ["流行", "新款", "精选"],
       isBackTopShow: false,
       tabOffsetTop: 0, //tabControl 离顶高度
-      isTabFixed: false //tabcontrol 是否吸顶
+      isTabFixed: false,//tabcontrol 是否吸顶
+      saveY: 0, //离开当前路由时的 y值
     };
-  },
-  created() {
-    // 初始加载
-    this.init();
   },
   methods: {
     /**
@@ -99,9 +97,9 @@ export default {
     // 监听 better-scroll 滚动事件
     contentScroll(position) {
       // 1. 判断 backTop 是否显示
-      this.isBackTopShow = -position.y > 1000;
+      this.isBackTopShow = (-position.y) > this.tabOffsetTop;
       // 2. 决定 tab-control 是否吸顶
-      this.isTabFixed = -position.y > this.tabOffsetTop;
+      this.isTabFixed = (-position.y) > this.tabOffsetTop;
     },
     // 商品图片加载
     loadMore() {
@@ -158,16 +156,35 @@ export default {
     }
   },
   mounted() {
-    const refresh = debounce(this.$refs.scroll.refresh, 200);
-    //3. 监听item中图片加载完成
-    this.$bus.$on("itemImageLoad", () => {
-      refresh();
-    });
   },
   computed: {
     showGoods() {
       return this.goods[this.currentType].list;
     }
+  },
+  created() {
+    // 初始加载
+    this.init();
+  },
+  destroyed() {
+    console.log('Home destroy');
+  },
+  /* 
+    activated  deactivated 这两个钩子函数 只在 keep-alive 才有效
+  */
+  activated() {
+    // 进入当前组件
+    this.$refs.scroll.refresh()
+    this.$refs.scroll.scrollTo(0, this.saveY, 0)
+    // 重新刷新  防止回到页面顶部
+  },
+  deactivated() {
+    // 离开当前组件
+    // 1. 保存 Y只
+    this.saveY = this.$refs.scroll.getScrollY()
+
+    // 2. 取消全局事件的监听
+    this.$bus.$off('itemImgLoad', this.itemImgListener)
   }
 };
 </script>
