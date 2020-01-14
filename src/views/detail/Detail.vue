@@ -5,13 +5,13 @@
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" ref="goodsinfo"/>
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" ref="goodsinfo" />
       <detail-param-info :paramInfo="paramInfo" ref="params" />
       <detail-comment-info :comment-info="commentInfo" ref="comment" />
       <detail-recommend-info :recommends="recommends" ref="recommend" />
     </Scroll>
-    <detail-botton-bar />
-    <back-top @click.native="backTop" v-show="isShowBackTop"/>
+    <detail-botton-bar @addCart="addToCart" />
+    <back-top @click.native="backTop" v-show="isShowBackTop" />
   </div>
 </template>
 
@@ -27,7 +27,7 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
-import DetailBottonBar from './childComps/DetailBottonBar'
+import DetailBottonBar from "./childComps/DetailBottonBar";
 // 通用js文件
 import { itemListenerMixin, backTopMixin } from "common/mixin";
 // 请求
@@ -71,7 +71,7 @@ export default {
       this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
       this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
       // 添加一个占位
-      this.themeTopYs.push(Number.MAX_VALUE)
+      this.themeTopYs.push(Number.MAX_VALUE);
     },
     detailScroll(position) {
       const positionY = -position.y + 44;
@@ -84,13 +84,28 @@ export default {
       */
       let length = this.themeTopYs.length;
       for (let i = 0; i < length - 1; i++) {
-        if(this.currentIndex !== i && (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i + 1])) {
-          this.currentIndex = i
-          this.$refs.nav.currentIndex = this.currentIndex
+        if (
+          this.currentIndex !== i &&
+          (positionY >= this.themeTopYs[i] &&
+            positionY < this.themeTopYs[i + 1])
+        ) {
+          this.currentIndex = i;
+          this.$refs.nav.currentIndex = this.currentIndex;
         }
       }
       // 判断是否显示 backTop
-      this.showBackTop(position, this.$refs.goodsinfo.$el.offsetTop)
+      this.showBackTop(position, this.$refs.goodsinfo.$el.offsetTop);
+    },
+    addToCart() {
+      // 1. 获取购物侧需要显示的信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc
+      product.price = this.goods.lowNowPrice
+      product.iid = this.iid
+      // 2. 将商品添加到购物车
+      this.$store.dispatch("addCart", product)
     }
   },
   components: {
