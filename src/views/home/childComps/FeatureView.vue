@@ -1,7 +1,7 @@
 <template>
   <div class="feature">
     <a href="https://act.mogujie.com/zzlx67">
-      <img src="~assets/img/home/recommend_bg.jpg" />
+      <img src="~assets/img/home/recommend_bg.jpg" @load="imgLoad"/>
     </a>
   </div>
 </template>
@@ -9,7 +9,13 @@
 <script>
 export default {
   name: "FeatureView",
-  props: {}
+  props: {},
+  methods: {
+    imgLoad() {
+      this.$emit('featureImageLoad')
+      
+    }
+  },
 };
 </script>
 

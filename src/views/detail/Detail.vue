@@ -1,15 +1,17 @@
 <template>
   <div id="detail">
-    <detail-nav-bar @titleClick="titleClick" ref="nav"/>
+    <detail-nav-bar @titleClick="titleClick" ref="nav" />
     <Scroll class="content" ref="scroll" :probe-type="3" @scroll="detailScroll">
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" />
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" ref="goodsinfo"/>
       <detail-param-info :paramInfo="paramInfo" ref="params" />
       <detail-comment-info :comment-info="commentInfo" ref="comment" />
       <detail-recommend-info :recommends="recommends" ref="recommend" />
     </Scroll>
+    <detail-botton-bar />
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -25,9 +27,9 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
-
+import DetailBottonBar from './childComps/DetailBottonBar'
 // 通用js文件
-import { itemListenerMixin } from "common/mixin";
+import { itemListenerMixin, backTopMixin } from "common/mixin";
 // 请求
 import {
   getDetail,
@@ -68,28 +70,27 @@ export default {
       this.themeTopYs.push(this.$refs.params.$el.offsetTop);
       this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
       this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      // 添加一个占位
+      this.themeTopYs.push(Number.MAX_VALUE)
     },
     detailScroll(position) {
       const positionY = -position.y + 44;
-
-      // 对比
-      // [0, 8888] -> 0
-      // [8888, 9999] -> 1
-      // [9999, 11111] -> 2
-      // [11111, 18888] -> 3
+      /* 
+        对比
+        [0, 8888] -> 0
+        [8888, 9999] -> 1
+        [9999, 11111] -> 2
+        [11111, 18888] -> 3 
+      */
       let length = this.themeTopYs.length;
-      for (let i = 0; i < length; i++) {
-        if (
-          this.currentIndex !== i &&
-          ((i < length - 1 &&
-            positionY >= this.themeTopYs[i] &&
-            positionY < this.themeTopYs[i + 1]) ||
-            (i === length - 1 && positionY > this.themeTopYs[i]))
-        ) {
+      for (let i = 0; i < length - 1; i++) {
+        if(this.currentIndex !== i && (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i + 1])) {
           this.currentIndex = i
           this.$refs.nav.currentIndex = this.currentIndex
         }
       }
+      // 判断是否显示 backTop
+      this.showBackTop(position, this.$refs.goodsinfo.$el.offsetTop)
     }
   },
   components: {
@@ -101,7 +102,8 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
-    DetailRecommendInfo
+    DetailRecommendInfo,
+    DetailBottonBar
   },
   created() {
     //  1. 保存传入的 iid
@@ -146,7 +148,7 @@ export default {
   destroyed() {
     this.$bus.$off("itemImgLoad", this.itemImgListener);
   },
-  mixins: [itemListenerMixin]
+  mixins: [itemListenerMixin, backTopMixin]
 };
 </script>
 
@@ -158,7 +160,7 @@ export default {
   height: 100vh;
 }
 .content {
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 49px);
   overflow: hidden;
 }
 </style>

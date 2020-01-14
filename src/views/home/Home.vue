@@ -12,14 +12,14 @@
       :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
-      <recommend-view :recommends="recommends" />
-      <feature-view />
+      <home-swiper :banners="banners" @swiperImageLoad="calcOffsetTtop" />
+      <recommend-view :recommends="recommends" @recommendViewImageLoad="calcOffsetTtop"/>
+      <feature-view @featureImageLoad="calcOffsetTtop"/>
       <tab-control :titles="titles" @tabClick="tabClick" ref="tabControl2"/>
       <goods-list :goods="showGoods" />
     </Scroll>
 
-    <back-top @click.native="handleBackClick" v-show="isBackTopShow"></back-top>
+    <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -33,15 +33,15 @@ import BackTop from "components/content/backTop/BackTop";
 
 // 子组件
 import HomeSwiper from "./childComps/HomeSwiper";
-import RecommendView from "./childComps/RecoommendView";
+import RecommendView from "./childComps/RecommendView";
 import FeatureView from "./childComps/FeatureView";
 // 数据
 import { getHomeMultidata, getHomeGoods } from "network/home";
 // 通用js文件
-import {itemListenerMixin} from 'common/mixin'
+import {itemListenerMixin, backTopMixin} from 'common/mixin'
 export default {
   name: "Home",
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, backTopMixin],
   components: {
     NavBar,
     TabControl,
@@ -64,10 +64,10 @@ export default {
       },
       currentType: "pop",
       titles: ["流行", "新款", "精选"],
-      isBackTopShow: false,
       tabOffsetTop: 0, //tabControl 离顶高度
       isTabFixed: false,//tabcontrol 是否吸顶
       saveY: 0, //离开当前路由时的 y值
+      LoadNum: 0 //加载次数
     };
   },
   methods: {
@@ -90,14 +90,11 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index
     },
-    // 返回顶部
-    handleBackClick() {
-      this.$refs.scroll.scrollTo(0, 0, 500);
-    },
     // 监听 better-scroll 滚动事件
     contentScroll(position) {
       // 1. 判断 backTop 是否显示
-      this.isBackTopShow = (-position.y) > this.tabOffsetTop;
+      // this.isShowBackTop = (-position.y) > this.tabOffsetTop;
+      this.showBackTop(position, this.tabOffsetTop)
       // 2. 决定 tab-control 是否吸顶
       this.isTabFixed = (-position.y) > this.tabOffsetTop;
     },
@@ -105,11 +102,14 @@ export default {
     loadMore() {
       this.getHomeProducts(this.currentType);
     },
-    // 轮播图片加载
-    swiperImageLoad() {
+    // j监听 swiper recommendview feature 三个图片加载完成 再去计算 nav 的 offsettop 属性
+    calcOffsetTtop() {
       // 给 tabOffsetTop 赋值
       // 所有的组件都有一个属性 $el 获取组件中的元素
-      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      if(this.LoadNum === 2) {
+         this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      } 
+      this.LoadNum++
     },
 
     /**
