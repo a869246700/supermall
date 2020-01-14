@@ -90,14 +90,15 @@ export default {
 }
 
 .info-service-item img {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   position: relative;
+  margin-right: 2px;
   top: 2px;
 }
 
 .info-service-item span {
-  font-size: 13px;
+  font-size: 12px;
   color: #333;
 }
 </style>

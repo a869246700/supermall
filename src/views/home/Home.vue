@@ -93,7 +93,6 @@ export default {
     // 监听 better-scroll 滚动事件
     contentScroll(position) {
       // 1. 判断 backTop 是否显示
-      // this.isShowBackTop = (-position.y) > this.tabOffsetTop;
       this.showBackTop(position, this.tabOffsetTop)
       // 2. 决定 tab-control 是否吸顶
       this.isTabFixed = (-position.y) > this.tabOffsetTop;
@@ -102,7 +101,7 @@ export default {
     loadMore() {
       this.getHomeProducts(this.currentType);
     },
-    // j监听 swiper recommendview feature 三个图片加载完成 再去计算 nav 的 offsettop 属性
+    // 监听 swiper recommendview feature 三个图片加载完成 再去计算 nav 的 offsettop 属性
     calcOffsetTtop() {
       // 给 tabOffsetTop 赋值
       // 所有的组件都有一个属性 $el 获取组件中的元素
