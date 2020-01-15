@@ -3,7 +3,13 @@
     <nav-bar class="home-nav">
       <template #center>购物街</template>
     </nav-bar>
-    <tab-control :titles="titles" @tabClick="tabClick" ref="tabControl1" class="tab-control" v-show="isTabFixed"/>
+    <tab-control
+      :titles="titles"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      class="tab-control"
+      v-show="isTabFixed"
+    />
     <Scroll
       class="content"
       ref="scroll"
@@ -13,9 +19,9 @@
       @pullingUp="loadMore"
     >
       <home-swiper :banners="banners" @swiperImageLoad="calcOffsetTtop" />
-      <recommend-view :recommends="recommends" @recommendViewImageLoad="calcOffsetTtop"/>
-      <feature-view @featureImageLoad="calcOffsetTtop"/>
-      <tab-control :titles="titles" @tabClick="tabClick" ref="tabControl2"/>
+      <recommend-view :recommends="recommends" @recommendViewImageLoad="calcOffsetTtop" />
+      <feature-view @featureImageLoad="calcOffsetTtop" />
+      <tab-control :titles="titles" @tabClick="tabClick" ref="tabControl2" />
       <goods-list :goods="showGoods" />
     </Scroll>
 
@@ -38,7 +44,7 @@ import FeatureView from "./childComps/FeatureView";
 // 数据
 import { getHomeMultidata, getHomeGoods } from "network/home";
 // 通用js文件
-import {itemListenerMixin, backTopMixin} from 'common/mixin'
+import { itemListenerMixin, backTopMixin } from "common/mixin";
 export default {
   name: "Home",
   mixins: [itemListenerMixin, backTopMixin],
@@ -65,7 +71,7 @@ export default {
       currentType: "pop",
       titles: ["流行", "新款", "精选"],
       tabOffsetTop: 0, //tabControl 离顶高度
-      isTabFixed: false,//tabcontrol 是否吸顶
+      isTabFixed: false, //tabcontrol 是否吸顶
       saveY: 0, //离开当前路由时的 y值
       LoadNum: 0 //加载次数
     };
@@ -88,14 +94,14 @@ export default {
       }
       // 同步
       this.$refs.tabControl1.currentIndex = index;
-      this.$refs.tabControl2.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index;
     },
     // 监听 better-scroll 滚动事件
     contentScroll(position) {
       // 1. 判断 backTop 是否显示
-      this.showBackTop(position, this.tabOffsetTop)
+      this.showBackTop(position, this.tabOffsetTop);
       // 2. 决定 tab-control 是否吸顶
-      this.isTabFixed = (-position.y) > this.tabOffsetTop;
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
     // 商品图片加载
     loadMore() {
@@ -105,10 +111,10 @@ export default {
     calcOffsetTtop() {
       // 给 tabOffsetTop 赋值
       // 所有的组件都有一个属性 $el 获取组件中的元素
-      if(this.LoadNum === 2) {
-         this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
-      } 
-      this.LoadNum++
+      if (this.LoadNum === 2) {
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      }
+      this.LoadNum++;
     },
 
     /**
@@ -164,24 +170,24 @@ export default {
     this.init();
   },
   destroyed() {
-    console.log('Home destroy');
+    console.log("Home destroy");
   },
   /* 
     activated  deactivated 这两个钩子函数 只在 keep-alive 才有效
   */
   activated() {
     // 进入当前组件
-    this.refresh()
-    this.$refs.scroll.scrollTo(0, this.saveY, 0)
+    this.refresh();
+    this.$refs.scroll.scrollTo(0, this.saveY, 300);
     // 重新刷新  防止回到页面顶部
+    
   },
   deactivated() {
     // 离开当前组件
-    // 1. 保存 Y只
-    this.saveY = this.$refs.scroll.getScrollY()
-
+    // 1. 保存 Y值
+    this.saveY = this.$refs.scroll.getScrollY();
     // 2. 取消全局事件的监听
-    this.$bus.$off('itemImgLoad', this.itemImgListener)
+    this.$bus.$off("itemImgLoad", this.itemImgListener);
   }
 };
 </script>
