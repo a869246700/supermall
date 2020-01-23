@@ -25,18 +25,22 @@
 export default {
   name: "DetailBottonBar",
   methods: {
-      addToCart() {
-        this.$emit('addCart')
-      }
-  },
+    addToCart() {
+      this.$emit("addCart");
+    }
+  }
 };
 </script>
 
 <style scoped>
 .botton-bar {
   height: 49px;
+  position: fixed;
   background-color: #fff;
-  position: relative;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
   display: flex;
   text-align: center;
 }

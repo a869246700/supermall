@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 import mutations from './mutations'
 import actions from './actions'
-
+import getters from './getters'
 const state = {
     cartList: []
 }
@@ -16,7 +16,8 @@ const store = new Vuex.Store({
   state,
   /* mutations 尽可能完成的事件比较单一一点 */
   mutations,
-  actions
+  actions,
+  getters
 })
 // 3. 挂载到 vue 实例上
 export default store

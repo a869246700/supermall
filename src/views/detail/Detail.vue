@@ -17,7 +17,6 @@
 
 <script>
 import Scroll from "components/common/scroll/Scroll";
-
 // 子组件
 import DetailNavBar from "./childComps/DetailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
@@ -39,6 +38,8 @@ import {
   getRecommend
 } from "network/detail";
 
+import {mapActions} from 'vuex'
+
 export default {
   name: "Detail",
   data() {
@@ -56,6 +57,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['addCart']),
     imageLoad() {
       this.refresh();
       this.initHeight();
@@ -105,7 +107,23 @@ export default {
       product.price = this.goods.lowNowPrice
       product.iid = this.iid
       // 2. 将商品添加到购物车
-      this.$store.dispatch("addCart", product)
+
+      // 使用 mapActions 简化
+      this.addCart(product).then(res => {
+        /* this.show = true
+        this.message = res
+        setTimeout(() => {
+          this.show = false
+          this.message = ""
+        }, 1500) */
+
+        this.$toast.show(res, 1000)
+        console.log(res);
+        
+      })
+      /* this.$store.dispatch("addCart", product).then(res => {
+        console.log(res);
+      }) */
     }
   },
   components: {
