@@ -1,15 +1,15 @@
 <template>
   <div class="botton-bar">
     <div class="bar-item bar-left">
-      <div>
+      <div @click="handleAdvisoryService">
         <i class="icon service"></i>
         <span class="text">客服</span>
       </div>
-      <div>
+      <div @click="handleViewStoryDetail">
         <i class="icon shop"></i>
         <span class="text">店铺</span>
       </div>
-      <div>
+      <div @click="addStar">
         <i class="icon select"></i>
         <span class="text">收藏</span>
       </div>
@@ -27,6 +27,15 @@ export default {
   methods: {
     addToCart() {
       this.$emit("addCart");
+    },
+    addStar() {
+      this.$emit('addStar')
+    },
+    handleViewStoryDetail() {
+      this.$emit('handleViewStoryDetail')
+    },
+    handleAdvisoryService() {
+      this.$emit('handleAdvisoryService')
     }
   }
 };

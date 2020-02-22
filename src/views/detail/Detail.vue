@@ -10,7 +10,12 @@
       <detail-comment-info :comment-info="commentInfo" ref="comment" />
       <detail-recommend-info :recommends="recommends" ref="recommend" />
     </Scroll>
-    <detail-botton-bar @addCart="addToCart" />
+    <detail-botton-bar
+      @addCart="addToCart"
+      @addStar="handleStar"
+      @handleViewStoryDetail="handleViewStoryDetail"
+      @handleAdvisoryService="handleAdvisoryService"
+    />
     <back-top @click.native="backTop" v-show="isShowBackTop" />
   </div>
 </template>
@@ -38,7 +43,7 @@ import {
   getRecommend
 } from "network/detail";
 
-import {mapActions} from 'vuex'
+import { mapActions } from "vuex";
 
 export default {
   name: "Detail",
@@ -57,7 +62,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['addCart']),
+    ...mapActions(["addCart"]),
     imageLoad() {
       this.refresh();
       this.initHeight();
@@ -88,8 +93,8 @@ export default {
       for (let i = 0; i < length - 1; i++) {
         if (
           this.currentIndex !== i &&
-          (positionY >= this.themeTopYs[i] &&
-            positionY < this.themeTopYs[i + 1])
+          positionY >= this.themeTopYs[i] &&
+          positionY < this.themeTopYs[i + 1]
         ) {
           this.currentIndex = i;
           this.$refs.nav.currentIndex = this.currentIndex;
@@ -103,9 +108,9 @@ export default {
       const product = {};
       product.image = this.topImages[0];
       product.title = this.goods.title;
-      product.desc = this.goods.desc
-      product.price = this.goods.lowNowPrice
-      product.iid = this.iid
+      product.desc = this.goods.desc;
+      product.price = this.goods.lowNowPrice;
+      product.iid = this.iid;
       // 2. 将商品添加到购物车
 
       // 使用 mapActions 简化
@@ -117,13 +122,21 @@ export default {
           this.message = ""
         }, 1500) */
 
-        this.$toast.show(res, 1000)
+        this.$toast.show(res, 1000);
         console.log(res);
-        
-      })
+      });
       /* this.$store.dispatch("addCart", product).then(res => {
         console.log(res);
       }) */
+    },
+    handleStar() {
+      this.$toast.show("收藏成功", 1000);
+    },
+    handleViewStoryDetail() {
+      this.$toast.show("暂无店铺信息", 1000);
+    },
+    handleAdvisoryService() {
+      this.$toast.show("暂无客服服务", 1000);
     }
   },
   components: {
@@ -188,7 +201,7 @@ export default {
 <style scoped>
 #detail {
   position: relative;
-  z-index: 9;
+  z-index: 11;
   background-color: #fff;
   height: 100vh;
 }
